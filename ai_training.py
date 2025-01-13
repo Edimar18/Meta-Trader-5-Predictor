@@ -121,7 +121,7 @@ def train_model():
             monitor='val_loss',
             save_best_only=True,
             save_weights_only=False,
-            save_format='keras'  # Specify keras format
+            
         )
     ]
     

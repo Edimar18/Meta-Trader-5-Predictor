@@ -57,46 +57,77 @@ class MarketPredictor:
         """Plot candlestick chart with predictions"""
         # Prepare data for plotting
         dates = pd.date_range(
-            start=last_candles.index[-1],
+            start=datetime.now().replace(minute=0, second=0, microsecond=0) - pd.Timedelta(hours=2),
             periods=5,  # 2 actual + 3 predicted
             freq='H'
         )
         
         # Create DataFrame with actual candles
-        df_actual = last_candles.copy()
+        df_actual = pd.DataFrame(
+            last_candles[['open', 'high', 'low', 'close']].values,
+            index=dates[:2],
+            columns=['Open', 'High', 'Low', 'Close']
+        )
         
         # Create DataFrame with predicted candles
         df_pred = pd.DataFrame(
             predictions.reshape(3, 4),
             columns=['Open', 'High', 'Low', 'Close'],
-            index=dates[-3:]
+            index=dates[2:]
         )
         
-        # Plot
-        fig, ax = plt.subplots(figsize=(10, 6))
+        # Combine actual and predicted data
+        df_combined = pd.concat([df_actual, df_pred])
         
-        # Plot actual candles
-        mpf.plot(
-            df_actual,
+        # Define style
+        mc = mpf.make_marketcolors(
+            up='g',
+            down='r',
+            edge='inherit',
+            wick='inherit',
+            volume='in',
+            ohlc='inherit'
+        )
+        style = mpf.make_mpf_style(
+            marketcolors=mc,
+            gridstyle='',
+            y_on_right=True,
+            base_mpf_style='charles'
+        )
+        
+        # Create the plot
+        fig, axlist = mpf.plot(
+            df_combined,
             type='candle',
-            style='charles',
+            style=style,
             title='Market Prediction',
-            ax=ax,
-            volume=False
+            volume=False,
+            figsize=(10, 6),
+            returnfig=True,
+            panel_ratios=(1,),
+            tight_layout=True,
+            warn_too_much_data=10000
         )
         
-        # Plot predicted candles (with transparency)
-        mpf.plot(
-            df_pred,
-            type='candle',
-            style='charles',
-            alpha=0.7,
-            ax=ax,
-            volume=False
+        # Add legend for predicted candles
+        axlist[0].text(
+            0.02, 0.95, 
+            'Actual Candles', 
+            transform=axlist[0].transAxes,
+            color='white',
+            bbox=dict(facecolor='black', alpha=0.5)
+        )
+        axlist[0].text(
+            0.02, 0.90,
+            'Predicted Candles',
+            transform=axlist[0].transAxes,
+            color='white',
+            bbox=dict(facecolor='black', alpha=0.3)
         )
         
+        # Save the plot
         plt.savefig(os.path.join(config.CHART_SAVE_PATH, 'prediction.png'))
-        plt.close()
+        plt.close(fig)
     
     def display_prediction(self, current_time, session, confidence, last_price, predictions):
         """Display prediction in terminal"""

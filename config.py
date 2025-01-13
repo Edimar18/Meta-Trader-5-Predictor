@@ -39,7 +39,7 @@ MODEL_PARAMS = {
 RANDOM_SEED = 42
 EARLY_STOPPING_PATIENCE = 10
 MODEL_CHECKPOINT_PATH = "models/best_model.keras"
-TRAINING_DATA_PATH = "data/training_data.csv"
+TRAINING_DATA_PATH = "data/training_data.npz"
 
 # Market Sessions (UTC)
 MARKET_SESSIONS = {
