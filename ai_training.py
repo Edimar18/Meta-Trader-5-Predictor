@@ -120,7 +120,8 @@ def train_model():
             config.MODEL_CHECKPOINT_PATH,
             monitor='val_loss',
             save_best_only=True,
-            save_weights_only=False
+            save_weights_only=False,
+            save_format='keras'  # Specify keras format
         )
     ]
     
@@ -171,6 +172,9 @@ def train_model():
     plt.tight_layout()
     plt.savefig(os.path.join(config.CHART_SAVE_PATH, 'training_history.png'))
     plt.close()
+    
+    # Save final model explicitly in keras format
+    model.save(config.MODEL_CHECKPOINT_PATH, save_format='keras')
     
     return model, scaler_x, scaler_y
 

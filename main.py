@@ -19,7 +19,8 @@ init()
 class MarketPredictor:
     def __init__(self):
         """Initialize the predictor"""
-        self.model = load_model(config.MODEL_CHECKPOINT_PATH)
+        # Load model with custom_objects=None to ensure proper loading of .keras format
+        self.model = load_model(config.MODEL_CHECKPOINT_PATH, compile=True)
         data = np.load(config.TRAINING_DATA_PATH, allow_pickle=True)
         self.scaler_x = data['scaler_x'].item()
         self.scaler_y = data['scaler_y'].item()
